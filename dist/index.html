@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="可匯入 Excel、CSV 或 JSON 的多科目選擇題練習網站" />
+    <title>題庫練習室</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="#" aria-label="回到題庫設定">
+          <span class="brand-mark">Q</span>
+          <span>
+            <strong>題庫練習室</strong>
+            <small>匯入題庫，隨時練習</small>
+          </span>
+        </a>
+        <button id="openImportButton" class="button button-secondary" type="button">匯入題庫</button>
+      </header>
+
+      <main>
+        <section id="setupView" class="view setup-view">
+          <div class="hero-copy">
+            <p class="eyebrow">QUIZ BANK</p>
+            <h1>從題庫中抽題，<br /><span>專心練會每一題。</span></h1>
+            <p class="hero-description">選擇科目、題數與作答方式。支援四選一與五選一，題庫可由 Excel、CSV 或 JSON 匯入。</p>
+          </div>
+
+          <div class="setup-grid">
+            <section class="panel control-panel" aria-labelledby="quizSettingsTitle">
+              <div class="panel-heading">
+                <div>
+                  <p class="step-label">01</p>
+                  <h2 id="quizSettingsTitle">設定測驗</h2>
+                </div>
+                <span id="questionBankBadge" class="status-badge">尚未匯入題庫</span>
+              </div>
+
+              <label class="field-label" for="subjectSelect">測驗科目</label>
+              <select id="subjectSelect" class="input-control" disabled>
+                <option value="">請先匯入題庫</option>
+              </select>
+
+              <label class="field-label" for="questionCount">一次考幾題</label>
+              <div class="count-control">
+                <input id="questionCount" class="input-control" type="number" min="1" value="10" disabled />
+                <span>題</span>
+              </div>
+              <div class="quick-counts" aria-label="快速選擇題數">
+                <button type="button" data-count="5">5題</button>
+                <button type="button" data-count="10" class="is-active">10題</button>
+                <button type="button" data-count="20">20題</button>
+                <button type="button" data-count="50">50題</button>
+                <button type="button" data-count="all">全部</button>
+              </div>
+
+              <fieldset class="mode-picker">
+                <legend>作答方式</legend>
+                <label class="mode-option is-selected">
+                  <input type="radio" name="quizMode" value="practice" checked />
+                  <span class="mode-check"></span>
+                  <span>
+                    <strong>練習模式</strong>
+                    <small>選完立即顯示正確答案與說明</small>
+                  </span>
+                </label>
+                <label class="mode-option">
+                  <input type="radio" name="quizMode" value="exam" />
+                  <span class="mode-check"></span>
+                  <span>
+                    <strong>測驗模式</strong>
+                    <small>完成全部題目後才公布結果</small>
+                  </span>
+                </label>
+              </fieldset>
+
+              <button id="startQuizButton" class="button button-primary button-block" type="button" disabled>開始測驗</button>
+            </section>
+
+            <aside class="panel library-panel">
+              <div class="panel-heading compact">
+                <div>
+                  <p class="step-label">02</p>
+                  <h2>目前題庫</h2>
+                </div>
+              </div>
+              <div id="libraryEmpty" class="empty-state">
+                <div class="empty-icon">＋</div>
+                <h3>還沒有題目</h3>
+                <p>匯入題庫檔後，科目會自動出現在這裡。</p>
+                <button id="emptyImportButton" class="text-button" type="button">選擇題庫檔案</button>
+              </div>
+              <div id="librarySummary" class="library-summary" hidden></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="quizView" class="view quiz-view" hidden>
+          <div class="quiz-topbar">
+            <button id="exitQuizButton" class="icon-button" type="button" aria-label="離開測驗">←</button>
+            <div class="quiz-progress-copy">
+              <span id="quizSubjectLabel"></span>
+              <strong id="quizProgressLabel">第 1 / 10 題</strong>
+            </div>
+            <div class="score-pill">答對 <strong id="liveScore">0</strong></div>
+          </div>
+          <div class="progress-track"><span id="progressBar"></span></div>
+
+          <article class="question-card">
+            <div class="question-meta">
+              <span id="questionItemLabel">項次 1</span>
+              <span id="questionModeLabel">練習模式</span>
+            </div>
+            <h2 id="questionText"></h2>
+            <div id="optionsList" class="options-list"></div>
+            <div id="explanationBox" class="explanation-box" hidden>
+              <div id="answerStatus" class="answer-status"></div>
+              <p><strong>正確答案：</strong><span id="correctAnswerText"></span></p>
+              <p id="answerExplanation"></p>
+            </div>
+            <div class="question-actions">
+              <button id="previousButton" class="button button-secondary" type="button">上一題</button>
+              <button id="nextButton" class="button button-primary" type="button" disabled>下一題</button>
+            </div>
+          </article>
+        </section>
+
+        <section id="resultView" class="view result-view" hidden>
+          <div class="result-card">
+            <p class="eyebrow">RESULT</p>
+            <h1>本次測驗完成</h1>
+            <div class="score-ring">
+              <strong id="resultScore">0</strong>
+              <span>分</span>
+            </div>
+            <p id="resultSummary"></p>
+            <div id="wrongAnswerList" class="wrong-answer-list"></div>
+            <div class="result-actions">
+              <button id="retryWrongButton" class="button button-secondary" type="button">只練錯題</button>
+              <button id="backToSetupButton" class="button button-primary" type="button">回到題庫</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="importDialog" class="import-dialog">
+      <form method="dialog" class="dialog-shell">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">IMPORT</p>
+            <h2>匯入題庫</h2>
+          </div>
+          <button class="dialog-close" value="cancel" aria-label="關閉">×</button>
+        </div>
+        <label id="dropZone" class="drop-zone" for="fileInput">
+          <span class="upload-mark">↑</span>
+          <strong>選擇或拖曳題庫檔</strong>
+          <small>支援 .xlsx、.xls、.csv、.json</small>
+          <input id="fileInput" type="file" accept=".xlsx,.xls,.csv,.json" hidden />
+        </label>
+        <div class="format-note">
+          <strong>Excel第一列欄位</strong>
+          <p>科目、項次、題目、選項1、選項2、選項3、選項4、選項5、答案、答案說明</p>
+          <small>選項5及答案說明可留白；答案可填1～5、A～E或完整選項文字。</small>
+        </div>
+        <p id="importMessage" class="import-message" role="status"></p>
+        <div class="dialog-actions">
+          <button id="loadDemoButton" class="button button-secondary" type="button">載入示範題</button>
+          <button class="button button-primary" value="cancel">完成</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>

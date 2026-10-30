@@ -1,0 +1,10 @@
+# 題庫內容只在使用者瀏覽器匯入，不提交到公開儲存庫
+*.xlsx
+*.xls
+*.csv
+data/
+
+# 作業系統與編輯器檔案
+.DS_Store
+Thumbs.db
+.vscode/
